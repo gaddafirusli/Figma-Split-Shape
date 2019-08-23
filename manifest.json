@@ -1,0 +1,7 @@
+{
+  "name": "Split Shape",
+  "id": "746565487016656360",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html"
+}

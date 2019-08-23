@@ -1,0 +1,106 @@
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    padding: 16px;
+    font-size: 14px;
+  }
+  p {
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .actions {
+    display: flex;
+  }
+  button {
+    border: 0;
+    margin-top: 12px;
+    background: #18a0fb;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  button#split {
+    flex: 1;
+    font-weight: 500;
+  }
+  button#close {
+    width: 82px;
+    flex: 0 0 82px;
+    margin-right: 8px;
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #555;
+  }
+  button:focus {
+    outline: none;
+    box-shadow: inset 0px 0px 0 2px rgba(0, 0, 0, 0.1);
+  }
+  label {
+    width: 90px;
+    flex: 0 0 90px;
+    display: inline-block;
+  }
+  input[type="number"] {
+    padding: 8px 4px 8px 10px;
+    border: 1px solid #eee;
+    font-size: 14px;
+    flex: 1;
+    width: 100%;
+  }
+  input[type="number"]:focus {
+    outline: 2px solid #18a0fb;
+  }
+</style>
+<p>
+  <label>Columns</label> <input id="column" value="3" type="number" min="1" />
+</p>
+<p><label>Rows</label> <input id="row" value="1" type="number" min="1" /></p>
+<p><label>Gutter</label> <input id="gutter" value="12" type="number" /></p>
+<p><label>Margin</label> <input id="margin" value="0" type="number" /></p>
+<div class="actions">
+  <button id="close">Close</button>
+  <button id="split">Split</button>
+</div>
+<script>
+  document.getElementById("split").onclick = () => {
+    const input_column = document.getElementById("column");
+    const input_row = document.getElementById("row");
+    const input_gutter = document.getElementById("gutter");
+    const input_margin = document.getElementById("margin");
+    const column = parseInt(input_column.value, 10);
+    const row = parseInt(input_row.value, 10);
+    const gutter = parseInt(input_gutter.value, 10);
+    const margin = parseInt(input_margin.value, 10);
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "split",
+          column,
+          row,
+          gutter,
+          margin
+        }
+      },
+      "*"
+    );
+  };
+  document.getElementById("close").onclick = () => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "close"
+        }
+      },
+      "*"
+    );
+  };
+</script>

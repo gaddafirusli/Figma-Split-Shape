@@ -32,17 +32,13 @@
     flex: 1;
     font-weight: 500;
   }
-  button#close {
-    width: 82px;
-    flex: 0 0 82px;
-    margin-right: 8px;
-    background: #fff;
-    border: 1px solid #ccc;
-    color: #555;
-  }
+
   button:focus {
     outline: none;
     box-shadow: inset 0px 0px 0 2px rgba(0, 0, 0, 0.1);
+  }
+  button:disabled {
+    opacity: 0.5;
   }
   label {
     width: 90px;
@@ -67,15 +63,35 @@
 <p><label>Gutter</label> <input id="gutter" value="12" type="number" /></p>
 <p><label>Margin</label> <input id="margin" value="0" type="number" /></p>
 <div class="actions">
-  <button id="close">Close</button>
   <button id="split">Split</button>
 </div>
 <script>
+  const input_column = document.getElementById("column");
+  const input_row = document.getElementById("row");
+  const input_gutter = document.getElementById("gutter");
+  const input_margin = document.getElementById("margin");
+  const btn_split = document.getElementById("split");
+
+  onmessage = msg => {
+    if (!msg.data) return;
+    let type = msg.data.pluginMessage.type;
+
+    // Pre-populate input with previous options
+    if (type === "SETTINGS") {
+      let options = msg.data.pluginMessage.data;
+      input_column.value = options.column;
+      input_row.value = options.row;
+      input_gutter.value = options.gutter;
+      input_margin.value = options.margin;
+    }
+
+    // Update button based on selection
+    if (type === "SELECTION") {
+      btn_split.disabled = !msg.data.pluginMessage.data.withSelection;
+    }
+  };
+
   document.getElementById("split").onclick = () => {
-    const input_column = document.getElementById("column");
-    const input_row = document.getElementById("row");
-    const input_gutter = document.getElementById("gutter");
-    const input_margin = document.getElementById("margin");
     const column = parseInt(input_column.value, 10);
     const row = parseInt(input_row.value, 10);
     const gutter = parseInt(input_gutter.value, 10);
@@ -88,16 +104,6 @@
           row,
           gutter,
           margin
-        }
-      },
-      "*"
-    );
-  };
-  document.getElementById("close").onclick = () => {
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: "close"
         }
       },
       "*"

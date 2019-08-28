@@ -1,24 +1,39 @@
-let selections = figma.currentPage.selection;
+const key = "SETTINGS";
 
-// Check if there's at least 1 selection
-if (selections.length > 0) {
-  figma.showUI(__html__);
-  figma.ui.resize(250, 240);
-} else {
-  figma.notify("⚠️ Please select at least 1 shape or frame");
-  figma.closePlugin();
+// Show UI window
+figma.showUI(__html__, { width: 220, height: 235 });
+
+// Load previous options and send to UI
+figma.clientStorage.getAsync(key).then(options => {
+  figma.ui.postMessage({ data: options, type: "SETTINGS" });
+});
+
+// Get current selection
+let selections = figma.currentPage.selection;
+getSelections();
+
+setInterval(() => {
+  getSelections();
+}, 500);
+
+function getSelections() {
+  selections = figma.currentPage.selection;
+  figma.ui.postMessage({
+    data: { withSelection: selections.length > 0 ? true : false },
+    type: "SELECTION"
+  });
 }
 
 // When user click on Split button
 figma.ui.onmessage = msg => {
   if (msg.type === "split") {
-    for (const node of selections) {
-      // Get the params from UI window
-      let column = msg.column;
-      let row = msg.row;
-      let gutter = msg.gutter;
-      let margin = msg.margin;
+    // Get the params from UI window
+    let column = msg.column;
+    let row = msg.row;
+    let gutter = msg.gutter;
+    let margin = msg.margin;
 
+    for (const node of selections) {
       // Get the original properties of the node
       let width = node.width;
       let height = node.height;
@@ -44,6 +59,12 @@ figma.ui.onmessage = msg => {
       // Remove the original node
       node.remove();
     }
+
+    // Store option in client storage
+    let options = { column, row, gutter, margin };
+    figma.clientStorage.setAsync(key, options).then(() => {});
+
+    // Close the UI window
+    figma.closePlugin();
   }
-  figma.closePlugin();
 };

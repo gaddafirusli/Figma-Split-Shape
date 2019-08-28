@@ -1,12 +1,17 @@
 const key = "SETTINGS";
 // Show UI window
-figma.showUI(__html__, { width: 220, height: 235 });
+figma.showUI(__html__, { width: 220, height: 240 });
 // Load previous options and send to UI
 figma.clientStorage.getAsync(key).then(options => {
     figma.ui.postMessage({ data: options, type: "SETTINGS" });
 });
 // Get current selection
 let selections = figma.currentPage.selection;
+// Show warning if first launch with no selection
+if (selections.length === 0) {
+    figma.notify("⚠️ Please select at least 1 shape or frame");
+}
+// Poll for selections
 getSelections();
 setInterval(() => {
     getSelections();
